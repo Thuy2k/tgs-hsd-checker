@@ -255,7 +255,10 @@
                 <div class="hsd-search-item-info">
                     <div class="hsd-search-item-name">${esc(p.local_product_name)}</div>
                     <div class="hsd-search-item-meta">
-                        SKU: ${esc(p.local_product_sku || '-')} · SL: ${parseFloat(p.local_product_quantity_no_tracking || 0)}
+                        SKU: ${esc(p.local_product_sku || '-')} · ĐVT: ${esc(p.local_product_unit || '-')}
+                    </div>
+                    <div class="hsd-search-item-meta">
+                        Giá: ${Number(p.local_product_price_after_tax || 0).toLocaleString('vi-VN')}đ · SL: ${parseFloat(p.local_product_quantity_no_tracking || 0)}
                         ${p.local_product_barcode_main ? ' · BC: ' + esc(p.local_product_barcode_main) : ''}
                     </div>
                 </div>

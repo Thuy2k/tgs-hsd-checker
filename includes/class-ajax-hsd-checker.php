@@ -111,15 +111,16 @@ class TGS_HSD_Checker_Ajax
         $products = $wpdb->get_results($wpdb->prepare(
             "SELECT local_product_name_id, local_product_name, local_product_sku,
                     local_product_barcode_main, local_product_quantity_no_tracking,
-                    local_product_thumbnail, local_product_unit
+                    local_product_thumbnail, local_product_unit,
+                    local_product_price_after_tax
              FROM {$table}
              WHERE (local_product_parent_sku IS NULL OR local_product_parent_sku = '')
                AND (local_product_is_tracking IS NULL OR local_product_is_tracking = 0)
                AND (is_deleted IS NULL OR is_deleted = 0)
-               AND (local_product_name LIKE %s OR local_product_sku LIKE %s)
+               AND (local_product_name LIKE %s OR local_product_sku LIKE %s OR local_product_barcode_main LIKE %s)
              ORDER BY local_product_name ASC
              LIMIT 20",
-            $like, $like
+            $like, $like, $like
         ), ARRAY_A);
 
         self::ok(['products' => $products]);
