@@ -52,8 +52,10 @@
         totalHsdCount: $('#totalHsdCount'),
         // Children
         childrenList: $('#childrenList'),
-        // Add form
-        newHsdDate: $('#newHsdDate'),
+        // Add form - date fields
+        newHsdDay: $('#newHsdDay'),
+        newHsdMonth: $('#newHsdMonth'),
+        newHsdYear: $('#newHsdYear'),
         qtyModeLe: $('#qtyModeLe'),
         qtyModeThung: $('#qtyModeThung'),
         qtyLeBox: $('#qtyLeBox'),
@@ -100,6 +102,19 @@
         dom.newQtyThung.addEventListener('input', calcThung);
         dom.newQtyPerBox.addEventListener('input', calcThung);
         dom.newQtyLeExtra.addEventListener('input', calcThung);
+
+        // Date field auto-advance: DD→MM→YYYY
+        dom.newHsdDay.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length === 2) dom.newHsdMonth.focus();
+        });
+        dom.newHsdMonth.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length === 2) dom.newHsdYear.focus();
+        });
+        dom.newHsdYear.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '');
+        });
 
         // Save HSD
         dom.btnSaveHsd.addEventListener('click', saveHsd);
@@ -256,15 +271,24 @@
     function selectSearchProduct(el) {
         const id = el.dataset.id;
         const sku = el.dataset.sku;
+        const productName = el.querySelector('.hsd-search-item-name').textContent;
 
         // Extract full data from search result element
         const metaText = el.querySelector('.hsd-search-item-meta')?.textContent || '';
         const qtyMatch = metaText.match(/SL:\s*([\d.]+)/);
         const unitMatch = metaText.match(/ĐVT:\s*(\S+)/);
 
+        // Nếu đang map barcode → hỏi xác nhận trước
+        if (pendingBarcode) {
+            const msg = 'Gắn barcode:\n' + pendingBarcode + '\n\nvào sản phẩm:\n' + productName + '\nSKU: ' + sku + '\n\nBạn chắc chắn chứ?';
+            if (!confirm(msg)) {
+                return; // Hủy → để user tìm SP khác
+            }
+        }
+
         const product = {
             local_product_name_id: id,
-            local_product_name: el.querySelector('.hsd-search-item-name').textContent,
+            local_product_name: productName,
             local_product_sku: sku,
             local_product_thumbnail: el.querySelector('img').src,
             local_product_quantity_no_tracking: qtyMatch ? parseFloat(qtyMatch[1]) : 0,
@@ -276,7 +300,7 @@
         dom.searchInput.value = '';
         dom.searchResults.innerHTML = '';
 
-        // Nếu đang ở map mode → map barcode trước, rồi show product
+        // Nếu đang ở map mode → map barcode
         if (pendingBarcode) {
             mapBarcode(id, pendingBarcode);
         }
@@ -332,7 +356,9 @@
         };
 
         // Reset form
-        dom.newHsdDate.value = '';
+        dom.newHsdDay.value = '';
+        dom.newHsdMonth.value = '';
+        dom.newHsdYear.value = '';
         dom.newQtyLe.value = '';
         dom.newQtyThung.value = '';
         dom.newQtyPerBox.value = '';
@@ -465,13 +491,34 @@
     }
 
     // ─── SAVE HSD ────────────────────────────────────────
+    function getHsdValue() {
+        const dd = (dom.newHsdDay.value || '').trim();
+        const mm = (dom.newHsdMonth.value || '').trim();
+        const yyyy = (dom.newHsdYear.value || '').trim();
+        // All empty = no HSD
+        if (!dd && !mm && !yyyy) return '';
+        // Validate
+        const day = parseInt(dd, 10);
+        const month = parseInt(mm, 10);
+        const year = parseInt(yyyy, 10);
+        if (!day || !month || !year || day < 1 || day > 31 || month < 1 || month > 12 || year < 2020 || year > 2099) {
+            return null; // invalid
+        }
+        // Return YYYY-MM-DD
+        return yyyy.padStart(4, '0') + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    }
+
     function saveHsd() {
         if (!currentProduct) {
             toast('Chưa chọn sản phẩm!', 'error');
             return;
         }
 
-        const hsd = dom.newHsdDate.value; // YYYY-MM-DD or empty
+        const hsd = getHsdValue();
+        if (hsd === null) {
+            toast('Ngày không hợp lệ! DD/MM/YYYY', 'error');
+            return;
+        }
         const quantity = getNewQuantity();
 
         if (quantity <= 0) {
@@ -512,7 +559,9 @@
                 loadStats();
 
                 // Reset form
-                dom.newHsdDate.value = '';
+                dom.newHsdDay.value = '';
+                dom.newHsdMonth.value = '';
+                dom.newHsdYear.value = '';
                 dom.newQtyLe.value = '';
                 dom.newQtyThung.value = '';
                 dom.newQtyLeExtra.value = '0';

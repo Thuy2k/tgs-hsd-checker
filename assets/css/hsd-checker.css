@@ -133,10 +133,13 @@
 .hsd-search-item-name {
     font-weight: 600;
     font-size: 0.95rem;
+    word-break: break-word;
+    line-height: 1.35;
 }
 .hsd-search-item-meta {
     font-size: 0.8rem;
     color: #777;
+    word-break: break-all;
 }
 
 /* ── PRODUCT AREA ── */
@@ -312,8 +315,43 @@
 .hsd-add-form .card-body {
     padding: 14px;
 }
+/* ── DATE INPUTS DD/MM/YYYY ── */
+.hsd-date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.hsd-date-field {
+    text-align: center;
+    font-size: 1.2rem !important;
+    font-weight: 600;
+    letter-spacing: 1px;
+    width: 60px !important;
+    flex: 0 0 auto;
+    padding: 10px 4px !important;
+}
+.hsd-date-field.hsd-date-year {
+    width: 80px !important;
+}
+.hsd-date-sep {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #888;
+}
+
 .hsd-qty-mode .btn-outline-primary {
     border-radius: 10px;
+    border: 2px solid #696cff;
+    color: #696cff;
+    background: #fff;
+    font-weight: 600;
+    transition: all .15s ease;
+}
+.hsd-qty-mode .btn-check:checked + .btn-outline-primary {
+    background: #696cff !important;
+    color: #fff !important;
+    border-color: #696cff !important;
+    box-shadow: 0 2px 8px rgba(105, 108, 255, .35);
 }
 .hsd-thung-total, .hsd-thung-grand-total {
     text-align: center;

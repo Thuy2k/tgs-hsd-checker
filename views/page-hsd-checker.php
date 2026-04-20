@@ -134,10 +134,19 @@ $checker_css_url = TGS_HSD_CHECKER_URL . 'assets/css/hsd-checker.css';
             </div>
             <div class="collapse show" id="addHsdBody">
                 <div class="card-body">
-                    <!-- HSD Date -->
+                    <!-- HSD Date - 3 ô DD/MM/YYYY -->
                     <div class="mb-3">
                         <label class="form-label">Hạn sử dụng <small class="text-muted">(để trống = không có HSD)</small></label>
-                        <input type="date" class="form-control form-control-lg" id="newHsdDate">
+                        <div class="hsd-date-inputs">
+                            <input type="text" class="form-control form-control-lg hsd-date-field" id="newHsdDay"
+                                   placeholder="DD" maxlength="2" inputmode="numeric" autocomplete="off">
+                            <span class="hsd-date-sep">/</span>
+                            <input type="text" class="form-control form-control-lg hsd-date-field" id="newHsdMonth"
+                                   placeholder="MM" maxlength="2" inputmode="numeric" autocomplete="off">
+                            <span class="hsd-date-sep">/</span>
+                            <input type="text" class="form-control form-control-lg hsd-date-field hsd-date-year" id="newHsdYear"
+                                   placeholder="YYYY" maxlength="4" inputmode="numeric" autocomplete="off">
+                        </div>
                     </div>
 
                     <!-- Quantity mode: Lẻ or Thùng -->
