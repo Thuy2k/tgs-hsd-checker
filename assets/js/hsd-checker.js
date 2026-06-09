@@ -266,20 +266,17 @@
         `).join('');
 
         // Bind click
-        dom.searchResults.querySelectorAll('.hsd-search-item').forEach(el => {
+        dom.searchResults.querySelectorAll('.hsd-search-item').forEach((el, index) => {
+            el._hsdProduct = products[index] || null;
             el.addEventListener('click', () => selectSearchProduct(el));
         });
     }
 
     function selectSearchProduct(el) {
-        const id = el.dataset.id;
-        const sku = el.dataset.sku;
-        const productName = el.querySelector('.hsd-search-item-name').textContent;
-
-        // Extract full data from search result element
-        const metaText = el.querySelector('.hsd-search-item-meta')?.textContent || '';
-        const qtyMatch = metaText.match(/SL:\s*([\d.]+)/);
-        const unitMatch = metaText.match(/ĐVT:\s*(\S+)/);
+        const payload = el._hsdProduct || {};
+        const id = payload.local_product_name_id || el.dataset.id;
+        const sku = payload.local_product_sku || el.dataset.sku;
+        const productName = payload.local_product_name || el.querySelector('.hsd-search-item-name').textContent;
 
         // Nếu đang map barcode → hỏi xác nhận trước
         if (pendingBarcode) {
@@ -293,9 +290,9 @@
             local_product_name_id: id,
             local_product_name: productName,
             local_product_sku: sku,
-            local_product_thumbnail: el.querySelector('img').src,
-            local_product_quantity_no_tracking: qtyMatch ? parseFloat(qtyMatch[1]) : 0,
-            local_product_unit: unitMatch ? unitMatch[1] : '',
+            local_product_thumbnail: payload.local_product_thumbnail || el.querySelector('img').src,
+            local_product_quantity_no_tracking: parseFloat(payload.local_product_quantity_no_tracking || 0),
+            local_product_unit: payload.local_product_unit || '',
         };
 
         // Close search UI
